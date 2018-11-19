@@ -8,7 +8,7 @@ boo = True
 
 def startnew():
 	global sock
-	sock.bind((socket.gethostname(), 5000))
+	sock.bind((socket.gethostbyname(socket.getfqdn()), 5000))
 	print 'Convo started. IP is: ' + str(socket.gethostbyname(socket.getfqdn()))
 	sock.listen(1)
 	con, addr = sock.accept()
