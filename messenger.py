@@ -31,7 +31,7 @@ def join():
 
 def getpath():
 	path = raw_input('Enter the file name or path or drag and drop here: ')
-	if path[0] == path[-1] == '\"': path = path[1:-2]
+	if path[0] == path[-1] == '\"': path = path[1:-1]
 	return path
 
 
@@ -42,7 +42,12 @@ def deliver():
 	sock.send('<recieve> ' + file)
 	acceptance = sock.recv(1024)
 	if '<ok>' in acceptance:
-		print 'accepted'
+		print '\nFile accepted. Sending...'
+		with open(file, 'rb') as f:
+			for each in f:
+				sock.send(each)
+		sock.send('<end>')
+		print 'File sent successfully!'
 	else:
 		print 'File sending failed: reciever rejected request!'
 
@@ -50,20 +55,22 @@ def deliver():
 def recieve(message):
 	global sock
 	losbytes = []
-	print '\nFile incoming: ' + message[10:]
+	message = message[10:].split('\\')[-1]
+	print '\nFile incoming: ' + message
 	choice = raw_input('\nAccept file? (Y/N): ').lower()
 	if choice == 'y':
 		sock.send('<ok>')
+		print '\nRecieving...'
 		while True:
 			byte = sock.recv(1024)
 			if '<end>' in byte:
 				break
 			else:
 				losbytes.append(byte)
-		with open(message[10:], 'wb') as file:
+		with open(message, 'wb') as file:
 			for each in losbytes:
 				file.write(each)
-				#ending
+		print '\nFile recieved successfully!\n'
 	else:
 		sock.send('<no>')
 
@@ -89,7 +96,7 @@ def sender():
 	global boo
 	while True:
 		message = raw_input('\n')
-		if message in ['', 'x']: 
+		if message in ['<x>', '<exit>']: 
 			sock.close()
 			boo = False
 			break
