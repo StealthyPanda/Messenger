@@ -29,6 +29,45 @@ def join():
 		print '\nConnected to someone!'
 
 
+def getpath():
+	path = raw_input('Enter the file name or path or drag and drop here: ')
+	if path[0] == path[-1] == '\"': path = path[1:-2]
+	return path
+
+
+def deliver():
+	global sock
+	file = getpath()
+	print '\nTryna send ' + file
+	sock.send('<recieve> ' + file)
+	acceptance = sock.recv(1024)
+	if '<ok>' in acceptance:
+		print 'accepted'
+	else:
+		print 'File sending failed: reciever rejected request!'
+
+
+def recieve(message):
+	global sock
+	losbytes = []
+	print '\nFile incoming: ' + message[10:]
+	choice = raw_input('\nAccept file? (Y/N): ').lower()
+	if choice == 'y':
+		sock.send('<ok>')
+		while True:
+			byte = sock.recv(1024)
+			if '<end>' in byte:
+				break
+			else:
+				losbytes.append(byte)
+		with open(message[10:], 'wb') as file:
+			for each in losbytes:
+				file.write(each)
+				#ending
+	else:
+		sock.send('<no>')
+
+
 
 
 
@@ -54,7 +93,10 @@ def sender():
 			sock.close()
 			boo = False
 			break
-		sock.send(nick + ': ' + message)
+		elif '<send>' in message:
+			deliver()
+		else:
+			sock.send(nick + ': ' + message)
 
 
 def reciever():
@@ -69,7 +111,10 @@ def reciever():
 			sock.close()
 			boo = False
 			break
-		print recieved + '\n'
+		elif '<recieve>' in recieved:
+			recieve(recieved)
+		else:
+			print recieved + '\n'
 
 thread.start_new_thread(sender, ())
 thread.start_new_thread(reciever, ())
