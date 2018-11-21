@@ -100,7 +100,7 @@ def sender():
 			sock.close()
 			boo = False
 			break
-		elif '<send>' in message:
+		elif '<send>' in message.lower():
 			deliver()
 		else:
 			sock.send(nick + ': ' + message)
