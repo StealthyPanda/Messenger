@@ -18,7 +18,7 @@ def startnew():
 
 
 def join():
-	ip = raw_input("Enter the convo's IP: ")
+	ip = raw_input("\nEnter the convo's IP: ")
 	try:
 		sock.connect((ip, 5000))
 	except:
@@ -30,7 +30,7 @@ def join():
 
 
 def getpath():
-	path = raw_input('Enter the file name or path or drag and drop here: ')
+	path = raw_input('\nEnter the file name or path or drag and drop here: ')
 	if path[0] == path[-1] == '\"': path = path[1:-1]
 	return path
 
@@ -38,29 +38,29 @@ def getpath():
 def deliver():
 	global sock
 	file = getpath()
-	print '\nTryna send ' + file
+	print '\n<!--Tryna send ' + file + ' -->'
 	sock.send('<recieve> ' + file)
 	acceptance = sock.recv(1024)
 	if '<ok>' in acceptance:
-		print '\nFile accepted. Sending...'
+		print '\n<!--File accepted. Sending...-->'
 		with open(file, 'rb') as f:
 			for each in f:
 				sock.send(each)
 		sock.send('<end>')
-		print 'File sent successfully!'
+		print '<!--File sent successfully!-->'
 	else:
-		print 'File sending failed: reciever rejected request!'
+		print '<!--File sending failed: reciever rejected request!-->'
 
 
 def recieve(message):
 	global sock
 	losbytes = []
 	message = message[10:].split('\\')[-1]
-	print '\nFile incoming: ' + message
+	print '\n<!--File incoming: ' + message + ' -->'
 	choice = raw_input('\nAccept file? (Y/N): ').lower()
 	if choice == 'y':
 		sock.send('<ok>')
-		print '\nRecieving...'
+		print '\n<!--Recieving...-->'
 		while True:
 			byte = sock.recv(1024)
 			if '<end>' in byte:
@@ -70,7 +70,7 @@ def recieve(message):
 		with open(message, 'wb') as file:
 			for each in losbytes:
 				file.write(each)
-		print '\nFile recieved successfully!\n'
+		print '\n<!--File recieved successfully!-->\n'
 	else:
 		sock.send('<no>')
 
