@@ -1,7 +1,7 @@
 # Messenger
 Just a messenger
 
-Basically you have to install messenger.py on 2 computers(which are connected either by lan or wlan or whwatever)
+Basically you have to install messenger.py on 2 computers (which are connected either by lan or wlan or whatever)
 Then, connect using ip addresses.
 
 How to use: 
