@@ -1,5 +1,5 @@
 import socket
-import thread
+import _thread
 
 
 sock = socket.socket()
@@ -9,28 +9,28 @@ boo = True
 def startnew():
 	global sock
 	sock.bind((socket.gethostbyname(socket.getfqdn()), 5000))
-	print 'Convo started. IP is: ' + str(socket.gethostbyname(socket.getfqdn()))
+	print('Convo started. IP is: ' + str(socket.gethostbyname(socket.getfqdn())))
 	sock.listen(1)
 	con, addr = sock.accept()
-	print '\n'+con.recv(1024) + ' joined the convo!'
+	print('\n'+con.recv(1024) + ' joined the convo!')
 	sock = con
 
 
 
 def join():
-	ip = raw_input("\nEnter the convo's IP: ")
+	ip = input("\nEnter the convo's IP: ")
 	try:
 		sock.connect((ip, 5000))
 	except:
-		print '\nInvalid IP!\n'
+		print('\nInvalid IP!\n')
 		init()
 	else:
 		sock.send(nick)
-		print '\nConnected to someone!'
+		print('\nConnected to someone!')
 
 
 def getpath():
-	path = raw_input('\nEnter the file name or path or drag and drop here: ')
+	path = input('\nEnter the file name or path or drag and drop here: ')
 	if path[0] == path[-1] == '\"': path = path[1:-1]
 	return path
 
@@ -38,29 +38,29 @@ def getpath():
 def deliver():
 	global sock
 	file = getpath()
-	print '\n<!--Tryna send ' + file + ' -->'
+	print('\n<!--Tryna send ' + file + ' -->')
 	sock.send('<recieve> ' + file)
 	acceptance = sock.recv(1024)
 	if '<ok>' in acceptance:
-		print '\n<!--File accepted. Sending...-->'
+		print('\n<!--File accepted. Sending...-->')
 		with open(file, 'rb') as f:
 			for each in f:
 				sock.send(each)
 		sock.send('<end>')
-		print '<!--File sent successfully!-->'
+		print('<!--File sent successfully!-->')
 	else:
-		print '<!--File sending failed: reciever rejected request!-->'
+		print('<!--File sending failed: reciever rejected request!-->')
 
 
 def recieve(message):
 	global sock
 	losbytes = []
 	message = message[10:].split('\\')[-1]
-	print '\n<!--File incoming: ' + message + ' -->'
-	choice = raw_input('\nAccept file? (Y/N): ').lower()
+	print('\n<!--File incoming: ' + message + ' -->')
+	choice = input('\nAccept file? (Y/N): ').lower()
 	if choice == 'y':
 		sock.send('<ok>')
-		print '\n<!--Recieving...-->'
+		print('\n<!--Recieving...-->')
 		while True:
 			byte = sock.recv(1024)
 			if '<end>' in byte:
@@ -70,7 +70,7 @@ def recieve(message):
 		with open(message, 'wb') as file:
 			for each in losbytes:
 				file.write(each)
-		print '\n<!--File recieved successfully!-->\n'
+		print('\n<!--File recieved successfully!-->\n')
 	else:
 		sock.send('<no>')
 
@@ -78,24 +78,24 @@ def recieve(message):
 
 
 
-print '\nWelcome to Messenger By StealthyPanda!'
-nick = raw_input('\nEnter a nickname: ')
-print '\nStart new(n)(0) convo or join(j)(1) a convo:'
+print('\nWelcome to Messenger By StealthyPanda!')
+nick = input('\nEnter a nickname: ')
+print('\nStart new(n)(0) convo or join(j)(1) a convo:')
 def init():
-	choice = raw_input('> ').lower()
+	choice = input('> ').lower()
 	if choice in ['n', '0']:
 		startnew()
 	elif choice in ['j', '1']:
 		join()
 	else:
-		print '\n Invalid choice\n'
+		print('\n Invalid choice\n')
 		init()
 init()
 
 def sender():
 	global boo
 	while True:
-		message = raw_input('\n')
+		message = input('\n')
 		if message in ['<x>', '<exit>']: 
 			sock.close()
 			boo = False
@@ -112,7 +112,7 @@ def reciever():
 		try:
 			recieved = sock.recv(1024)
 		except:
-			print '\n<!--Convo was terminated by one of the recipients!-->\n'
+			print('\n<!--Convo was terminated by one of the recipients!-->\n')
 			break
 		if not recieved: 
 			sock.close()
@@ -121,10 +121,10 @@ def reciever():
 		elif '<recieve>' in recieved:
 			recieve(recieved)
 		else:
-			print recieved + '\n'
+			print(recieved + '\n')
 
-thread.start_new_thread(sender, ())
-thread.start_new_thread(reciever, ())
+_thread.start_new_thread(sender, ())
+_thread.start_new_thread(reciever, ())
 
 while boo:
 	pass
